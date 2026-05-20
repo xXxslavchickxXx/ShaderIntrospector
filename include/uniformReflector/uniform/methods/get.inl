@@ -1,9 +1,13 @@
+#pragma once
+
 #include <uniformReflector/traits/traits.h>
+#include <iostream>
 
 namespace shader {
     template<typename T>
     T uniform_entry::get() const {
         T value{};
+        if (!check_program()) return value;
 
         if (type != mapGlType<T>) {
             std::cerr << type << " " << mapGlType<T>;

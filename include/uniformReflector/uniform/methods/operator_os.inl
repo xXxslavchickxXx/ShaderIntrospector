@@ -1,143 +1,91 @@
+#include <iomanip> // для прсижина
+#include <toString/toString.h>
+
 namespace shader {
     inline std::ostream& operator<<(std::ostream& os, const uniform_entry& entry) {
+        // Форматируем тип
+        std::string typeStr = toString(entry.type);
+        if (entry.elements > 1) {
+            typeStr += "[" + std::to_string(entry.elements) + "]";
+        }
+
+        // Выводим имя и тип
+        os << "-> " << entry.name << " (" << typeStr << ")\n";
+
+        // Выводим значение с отступом
+        const std::string indent = "    ";
+
+        auto print_matrix = [&]<typename Mat>(const Mat & m) {
+            const int rows = Mat::length();
+            const int cols = Mat::col_type::length();
+            for (int i = 0; i < rows; ++i) {
+                os << indent << "[";
+                for (int j = 0; j < cols; ++j) {
+                    if (j > 0) os << ", ";
+                    os << std::fixed << std::setprecision(2) << m[i][j];
+                }
+                os << "]";
+                if (i < rows - 1) os << "\n";
+            }
+        };
+
+        auto print_vec = [&]<typename Vec>(const Vec & v) {
+            os << indent << "(";
+            for (int j = 0; j < Vec::length(); ++j) {
+                if (j > 0) os << ", ";
+                if (std::is_same_v<typename Vec::value_type, bool>) {
+                    os << (v[j] ? "true" : "false");
+                }
+                else {
+                    os << v[j];
+                }
+            }
+            os << ")";
+        };
+
+        if (entry.elements > 1) {
+            for (int i = 0; i < entry.elements; ++i) {
+                auto elem = entry[i];
+                os << indent << "[" << i << "] = ";
+
+                switch (elem.type) {
+                    case GL_FLOAT: os << elem.get<float>(); break;
+                    case GL_INT: os << elem.get<int>(); break;
+                    case GL_UNSIGNED_INT: os << elem.get<unsigned int>(); break;
+                    case GL_BOOL: os << (elem.get<bool>() ? "true" : "false"); break;
+
+                    case GL_FLOAT_VEC2: print_vec(elem.get<glm::vec2>()); break;
+                    case GL_FLOAT_VEC3: print_vec(elem.get<glm::vec3>()); break;
+                    case GL_FLOAT_VEC4: print_vec(elem.get<glm::vec4>()); break;
+
+                    case GL_FLOAT_MAT2: print_matrix(elem.get<glm::mat2>()); break;
+                    case GL_FLOAT_MAT3: print_matrix(elem.get<glm::mat3>()); break;
+                    case GL_FLOAT_MAT4: print_matrix(elem.get<glm::mat4>()); break;
+                    default: os << "?";
+                }
+
+                if (i < entry.elements - 1) os << "\n";
+            }
+            return os;
+        }
+
         switch (entry.type) {
-        case GL_FLOAT: os << entry.get<float>(); break;
-        case GL_INT: os << entry.get<int>(); break;
-        case GL_UNSIGNED_INT: os << entry.get<unsigned int>(); break;
-        case GL_BOOL: os << (entry.get<bool>() ? "true" : "false"); break;
+        case GL_FLOAT: os << indent << entry.get<float>(); break;
+        case GL_INT: os << indent << entry.get<int>(); break;
+        case GL_UNSIGNED_INT: os << indent << entry.get<unsigned int>(); break;
+        case GL_BOOL: os << indent << (entry.get<bool>() ? "true" : "false"); break;
 
-        case GL_FLOAT_VEC2: {
-            auto v = entry.get<glm::vec2>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ")"); break;
-        }
-        case GL_INT_VEC2: {
-            auto v = entry.get<glm::ivec2>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ")"); break;
-        }
-        case GL_UNSIGNED_INT_VEC2: {
-            auto v = entry.get<glm::uvec2>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ")"); break;
-        }
-        case GL_BOOL_VEC2: {
-            auto v = entry.get<glm::bvec2>();
-            os << ("(" + std::string(v.x ? "true" : "false") + ", " +
-                std::string(v.y ? "true" : "false") + ")"); break;
-        }
+        case GL_FLOAT_VEC2: print_vec(entry.get<glm::vec2>()); break;
+        case GL_FLOAT_VEC3: print_vec(entry.get<glm::vec3>()); break;
+        case GL_FLOAT_VEC4: print_vec(entry.get<glm::vec4>()); break;
 
-        case GL_FLOAT_VEC3: {
-            auto v = entry.get<glm::vec3>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")"); break;
-        }
-        case GL_INT_VEC3: {
-            auto v = entry.get<glm::ivec3>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")"); break;
-        }
-        case GL_UNSIGNED_INT_VEC3: {
-            auto v = entry.get<glm::uvec3>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")"); break;
-        }
-        case GL_BOOL_VEC3: {
-            auto v = entry.get<glm::bvec3>();
-            os << ("(" + std::string(v.x ? "true" : "false") + ", " +
-                std::string(v.y ? "true" : "false") + ", " +
-                std::string(v.z ? "true" : "false") + ")"); break;
-        }
-
-        case GL_FLOAT_VEC4: {
-            auto v = entry.get<glm::vec4>();
-            os << ("(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " +
-                std::to_string(v.z) + ", " + std::to_string(v.w) + ")"); break;
-        }
-        case GL_INT_VEC4: {
-            auto v = entry.get<glm::ivec4>();
-            os << "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " +
-                std::to_string(v.z) + ", " + std::to_string(v.w) + ")"; break;
-        }
-        case GL_UNSIGNED_INT_VEC4: {
-            auto v = entry.get<glm::uvec4>();
-            os << "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " +
-                std::to_string(v.z) + ", " + std::to_string(v.w) + ")"; break;
-        }
-        case GL_BOOL_VEC4: {
-            auto v = entry.get<glm::bvec4>();
-            os << "(" + std::string(v.x ? "true" : "false") + ", " +
-                std::string(v.y ? "true" : "false") + ", " +
-                std::string(v.z ? "true" : "false") + ", " +
-                std::string(v.w ? "true" : "false") + ")"; break;
-        }
-
-        case GL_FLOAT_MAT2: {
-            auto m = entry.get<glm::mat2>();
-            os << "\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + "]"; break;
-        }
-        case GL_FLOAT_MAT3: {
-            auto m = entry.get<glm::mat3>();
-            os << "\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + ", " + std::to_string(m[2][2]) + "]"; break;
-        }
-        case GL_FLOAT_MAT4: {
-            auto m = entry.get<glm::mat4>();
-            os << "\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + ", " + std::to_string(m[0][3]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + ", " + std::to_string(m[1][3]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + ", " + std::to_string(m[2][2]) + ", " + std::to_string(m[2][3]) + "]\n" +
-                "[" + std::to_string(m[3][0]) + ", " + std::to_string(m[3][1]) + ", " + std::to_string(m[3][2]) + ", " + std::to_string(m[3][3]) + "]";
-            break;
-        }
-
-        case GL_FLOAT_MAT2x3: {
-            auto m = entry.get<glm::mat2x3>();
-            os << ("\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + "]"); break;
-        }
-        case GL_FLOAT_MAT2x4: {
-            auto m = entry.get<glm::mat2x4>();
-            os << "\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + ", " + std::to_string(m[0][3]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + ", " + std::to_string(m[1][3]) + "]";
-            break;
-        }
-        case GL_FLOAT_MAT3x2: {
-            auto m = entry.get<glm::mat3x2>();
-            os << ("\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + "]"); break;
-        }
-        case GL_FLOAT_MAT3x4: {
-            auto m = entry.get<glm::mat3x4>();
-            os << "\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + ", " + std::to_string(m[0][3]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + ", " + std::to_string(m[1][3]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + ", " + std::to_string(m[2][2]) + ", " + std::to_string(m[2][3]) + "]";
-            break;
-        }
-        case GL_FLOAT_MAT4x2: {
-            auto m = entry.get<glm::mat4x2>();
-            os << ("\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + "]\n" +
-                "[" + std::to_string(m[3][0]) + ", " + std::to_string(m[3][1]) + "]"); break;
-        }
-        case GL_FLOAT_MAT4x3: {
-            auto m = entry.get<glm::mat4x3>();
-            os << ("\n[" + std::to_string(m[0][0]) + ", " + std::to_string(m[0][1]) + ", " + std::to_string(m[0][2]) + "]\n" +
-                "[" + std::to_string(m[1][0]) + ", " + std::to_string(m[1][1]) + ", " + std::to_string(m[1][2]) + "]\n" +
-                "[" + std::to_string(m[2][0]) + ", " + std::to_string(m[2][1]) + ", " + std::to_string(m[2][2]) + "]\n" +
-                "[" + std::to_string(m[3][0]) + ", " + std::to_string(m[3][1]) + ", " + std::to_string(m[3][2]) + "]"); break;
-        }
-
-                            // Сэмплеры
-        case GL_SAMPLER_2D:
-        case GL_SAMPLER_3D:
-        case GL_SAMPLER_CUBE:
-        case GL_SAMPLER_2D_ARRAY:
-        case GL_SAMPLER_CUBE_MAP_ARRAY:
-            os << "texture unit " + std::to_string(entry.get<GLuint>()); break;
-
-        case GL_IMAGE_2D:
-            os << "image unit " + std::to_string(entry.get<GLuint>()); break;
+        case GL_FLOAT_MAT2: print_matrix(entry.get<glm::mat2>()); break;
+        case GL_FLOAT_MAT3: print_matrix(entry.get<glm::mat3>()); break;
+        case GL_FLOAT_MAT4: print_matrix(entry.get<glm::mat4>()); break;
 
         default:
-            os << "<unknown type: " + std::to_string(entry.type) + ">"; break;
+            os << indent << "<unknown>";
+            break;
         }
 
         return os;

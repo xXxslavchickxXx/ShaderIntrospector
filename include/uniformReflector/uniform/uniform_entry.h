@@ -6,58 +6,34 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace shader {
-
     class uniform_entry {
-    public:
-        std::string name;
+        std::string name = "";
         GLint location = -1;
         GLenum type = 0;
         GLint elements = 0;
         GLint programId = 0;
 
-    private:
-        void bindProgram() const {
-            GLint currentProgram = 0;
-            glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-            if (currentProgram != programId) {
-                glUseProgram(programId);
-            }
-        }
+        void bindProgram() const;
+        bool check_program() const;
+
+    public:
+        uniform_entry(std::string name, GLint location, GLenum type, GLint elements, GLint programId);
+        uniform_entry() = default;
 
     public:
         template<typename T>
-        void set(const T& value) const;
+        void set(const T& value);
         template<typename T>
         T get() const;
 
     public:
-        uniform_entry operator[](size_t index) const {
-            return at(index);
-        }
+        const uniform_entry operator[](size_t index) const;
+        const uniform_entry at(size_t index = 0) const;
 
-        uniform_entry at(size_t index = 0) const {
-            if (index > elements) {
-                throw std::out_of_range("out of range uniforms\n");
-            }
+        uniform_entry operator[](size_t index);
+        uniform_entry at(size_t index = 0);
 
-            if (elements > 1) {
-                std::string indexedName = name + "[" + std::to_string(index) + "]";
-                GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
-                return uniform_entry(indexedName, indexedLoc, type, 1, programId);
-            }
-
-            return *this;
-        }
-
-    public:
-        uniform_entry(std::string_view name, GLint location, GLenum type, GLint elements, GLint programId)
-            : name(name)
-            , location(location)
-            , type(type)
-            , elements(elements)
-            , programId(programId)
-        {}
-        uniform_entry() = default;
+        size_t size() const { return elements; }
 
         uniform_entry(const uniform_entry&) = default;
         uniform_entry& operator=(const uniform_entry&) = default;
@@ -68,12 +44,7 @@ namespace shader {
         operator T() const;
 
         template<typename T>
-        const uniform_entry& operator=(const T& value) const {
-            set(value);
-            return *this;
-        }
-        template<typename T>
-        const uniform_entry& operator=(T&& value) const {
+        uniform_entry& operator=(T&& value) {
             set(std::forward<T>(value));
             return *this;
         }

@@ -1,8 +1,12 @@
+#pragma once
+
 #include <uniformReflector/traits/traits.h>
+#include <iostream>
 
 namespace shader {
     template<typename T>
-    void uniform_entry::set(const T& value) const {
+    void uniform_entry::set(const T& value) {
+        if (!check_program()) return;
         bindProgram();
 
         if (type != mapGlType<T>) {

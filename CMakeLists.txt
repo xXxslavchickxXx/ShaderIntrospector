@@ -11,12 +11,15 @@ project(shaderIntrospector VERSION 1.0 LANGUAGES CXX)
 set(INTROSPECTOR_LIB_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/attributeReflector/attributeReflector.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/uniformReflector/uniformReflector.h
-)
+    "include/uniformReflector/traits/traits.h"
+    "include/uniformReflector/uniform/uniform_entry.h"
+    "include/tools.h")
 
 # Для удобства задаю все спп файлы в одну переменную
 set(INTROSPECTOR_LIB_CPP
 	${CMAKE_CURRENT_SOURCE_DIR}/src/attributeReflector/attributeReflector.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/uniformReflector/uniformReflector.cpp
+    "src/uniformReflector/uniform/uniform_entry.cpp"
 )
 
 # Создаю саму либу
