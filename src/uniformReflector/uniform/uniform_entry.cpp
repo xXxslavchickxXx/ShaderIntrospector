@@ -12,7 +12,7 @@ namespace shader {
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
             GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
-            return uniform_entry(indexedName, indexedLoc, type, 1, programId);
+            return uniform_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
         return *this;
@@ -28,7 +28,7 @@ namespace shader {
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
             GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
-            return uniform_entry(indexedName, indexedLoc, type, 1, programId);
+            return uniform_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
         return *this;
@@ -40,7 +40,7 @@ namespace shader {
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
             GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
-            return uniform_entry(indexedName, indexedLoc, type, 1, programId);
+            return uniform_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
         return *this;

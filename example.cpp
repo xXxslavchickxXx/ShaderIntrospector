@@ -16,10 +16,11 @@ int main() {
     auto program = shader::ShaderProgram::from_path("assets/shaders/testV.glsl", "assets/shaders/testF.glsl");
     
     auto uniref = shader::uniform_reflector(program.getId());
-    auto& unientry = uniref["jopa"];
 
     uniref["jopa"] = 4;
     uniref["jopa"][1] = 7;
 
-    std::cout << unientry;
+    uniref["projection"] = glm::mat4(1.f);
+
+    std::cout << uniref;
 }
