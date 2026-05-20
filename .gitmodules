@@ -1,0 +1,3 @@
+[submodule "libs/shader"]
+	path = libs/shader
+	url = https://github.com/xXxslavchickxXx/shader_lib
