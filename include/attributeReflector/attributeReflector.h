@@ -19,7 +19,6 @@ namespace shader {
 		std::unordered_map<std::string, AttributeInfo> attributes;
 
 	public:
-		AttributeReflector() = default;
 		AttributeReflector(GLuint programId) { reflect(programId); }
 
 		AttributeReflector(const AttributeReflector&) = delete;
@@ -27,11 +26,11 @@ namespace shader {
 		AttributeReflector(AttributeReflector&&) = default;
 		AttributeReflector& operator=(AttributeReflector&&) = default;
 
-		const AttributeInfo& operator[](const std::string& name) { return getAttribute(name); }
+		const AttributeInfo& operator[](const std::string& name) const;
+		const AttributeInfo& getAttribute(const std::string& name) const;
 
 		void reflect(GLuint programId);
 
-		const AttributeInfo& getAttribute(const std::string& name);
 		size_t getAttributesSize() const { return attributes.size(); }
 
 	private:

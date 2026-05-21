@@ -7,7 +7,7 @@ namespace shader {
     template<typename T>
     T uniform_entry::get() const {
         T value{};
-        if (!check_program()) return value;
+        if (!check_program(programId)) return value;
 
         if (type != mapGlType<T>) {
             std::cerr << type << " " << mapGlType<T>;

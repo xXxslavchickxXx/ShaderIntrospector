@@ -4,7 +4,7 @@ in vec3 aPos;
 in vec4 aColor;
 
 layout(std140) uniform CameraBlock {
-    mat4 uView;
+    mat4 uView[3];
     mat4 uProj;
     vec3 uCameraPos;
     float uTime;
@@ -17,6 +17,6 @@ uniform int jopa[2];
 
 void main() {
     outColor = aColor;
-    gl_Position = uProj * uView * projection * vec4(aPos, 1.0);
+    gl_Position = uProj * uView[0] * projection * vec4(aPos, 1.0);
     jopa;
 }

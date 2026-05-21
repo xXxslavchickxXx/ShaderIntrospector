@@ -3,11 +3,10 @@
 #include <uniformReflector/uniform/uniform_entry.h>
 
 #include <iostream>
-#include <tools.h>
 
 namespace shader {
     uniform_entry uniform_entry::operator[](size_t index) {
-        if (!check_program() || index > elements) return uniform_entry();
+        if (!check_program(programId) || index > elements) return uniform_entry();
 
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
@@ -19,7 +18,7 @@ namespace shader {
     }
 
     uniform_entry uniform_entry::at(size_t index) {
-        if (!check_program()) return uniform_entry();
+        if (!check_program(programId)) return uniform_entry();
 
         if (index > elements) {
             throw std::out_of_range("out of range uniforms\n");
@@ -35,7 +34,7 @@ namespace shader {
     }
 
     const uniform_entry uniform_entry::operator[](size_t index) const {
-        if (!check_program() || index > elements) return uniform_entry();
+        if (!check_program(programId) || index > elements) return uniform_entry();
         
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
@@ -47,7 +46,7 @@ namespace shader {
     }
 
     const uniform_entry uniform_entry::at(size_t index) const {
-        if (!check_program()) return uniform_entry();
+        if (!check_program(programId)) return uniform_entry();
 
         if (index > elements) {
             throw std::out_of_range("out of range uniforms\n");
@@ -70,16 +69,8 @@ namespace shader {
         , programId(programId)
     {}
 
-    bool uniform_entry::check_program() const {
-        if (!program_is_valid(programId)) {
-            std::cerr << "this program doesn't exist: " << programId;
-            return false;
-        }
-        return true;
-    }
-
     void uniform_entry::bindProgram() const {
-        if (!check_program()) return;
+        if (!check_program(programId)) return;
         GLint currentProgram = 0;
         glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
         if (currentProgram != programId) {

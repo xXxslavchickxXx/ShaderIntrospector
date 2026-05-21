@@ -1,6 +1,7 @@
 #include <attributeReflector/attributeReflector.h>
 
 #include <iostream>
+#include <vector>
 
 namespace shader {
 	void AttributeReflector::reflect(GLuint programId) {
@@ -26,7 +27,16 @@ namespace shader {
 		}
 	}
 
-	const AttributeInfo& AttributeReflector::getAttribute(const std::string& name) {
+	const AttributeInfo& AttributeReflector::operator[](const std::string& name) const {
+		auto iter = attributes.find(name);
+		if (iter == attributes.end()) {
+			std::cerr << ("this attribute doesn't exist in this shader: " + name);
+			return AttributeInfo();
+		}
+		return iter->second;
+	}
+
+	const AttributeInfo& AttributeReflector::getAttribute(const std::string& name) const {
 		auto iter = attributes.find(name);
 		if (iter == attributes.end()) throw std::out_of_range(("this attribute doesn't exist in this shader: " + name));
 		return iter->second;

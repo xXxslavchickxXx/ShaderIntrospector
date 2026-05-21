@@ -6,7 +6,7 @@
 namespace shader {
     template<typename T>
     void uniform_entry::set(const T& value) {
-        if (!check_program()) return;
+        if (!check_program(programId)) return;
         bindProgram();
 
         if (type != mapGlType<T>) {

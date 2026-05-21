@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <tools.h>
+
 namespace shader {
     class uniform_entry {
         std::string name = "";
@@ -14,7 +16,6 @@ namespace shader {
         GLint programId = 0;
 
         void bindProgram() const;
-        bool check_program() const;
 
     public:
         uniform_entry(std::string name, GLint location, GLenum type, GLint elements, GLint programId);
