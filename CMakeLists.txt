@@ -16,7 +16,7 @@ set(INTROSPECTOR_LIB_HEADERS
     "include/tools.h"
     "include/uniformBlockReflector/uniformBlockReflector.h"
     "include/uniformBlockReflector/uniformBlockInfo.h"
-)
+ "include/AGreflection.h")
 
 # Для удобства задаю все спп файлы в одну переменную
 set(INTROSPECTOR_LIB_CPP
@@ -42,7 +42,7 @@ target_link_libraries(shaderIntrospector PUBLIC GLEW::GLEW)
 option(BUILD_INTROSPECTOR_EXAMPLE OFF)
 
 if(BUILD_INTROSPECTOR_EXAMPLE)
-	add_executable(example example.cpp)
+	add_executable(example_intro example.cpp)
 
     # Для создания окна нужен глвф
     find_package(glfw3 REQUIRED)
@@ -53,13 +53,13 @@ if(BUILD_INTROSPECTOR_EXAMPLE)
     )
     
     # Подвязываем то что нужно
-    target_link_libraries(example
+    target_link_libraries(example_intro
         glfw
         shaderIntrospector
     )
 
     # Эта тема нужна для копирования ассетов в папку с исполняемым файлом
-    add_custom_command(TARGET example POST_BUILD
+    add_custom_command(TARGET example_intro POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/assets
         $<TARGET_FILE_DIR:example>/assets
