@@ -15,16 +15,16 @@ namespace shader {
 		GLenum type;
 	};
 
-	class AttributeReflector {
+	class attribute_reflector {
 		std::unordered_map<std::string, AttributeInfo> attributes;
 
 	public:
-		AttributeReflector(GLuint programId) { reflect(programId); }
+		attribute_reflector(GLuint programId) { reflect(programId); }
 
-		AttributeReflector(const AttributeReflector&) = delete;
-		AttributeReflector& operator=(const AttributeReflector&) = delete;
-		AttributeReflector(AttributeReflector&&) = default;
-		AttributeReflector& operator=(AttributeReflector&&) = default;
+		attribute_reflector(const attribute_reflector&) = delete;
+		attribute_reflector& operator=(const attribute_reflector&) = delete;
+		attribute_reflector(attribute_reflector&&) = default;
+		attribute_reflector& operator=(attribute_reflector&&) = default;
 
 		const AttributeInfo& operator[](const std::string& name) const;
 		const AttributeInfo& getAttribute(const std::string& name) const;
@@ -33,8 +33,19 @@ namespace shader {
 
 		size_t getAttributesSize() const { return attributes.size(); }
 
+		const auto& get_attributes() const { return attributes; }
+		// Для const итерации
+		auto begin() const { return attributes.begin(); }
+		auto end() const { return attributes.end(); }
+		auto cbegin() const { return attributes.cbegin(); }
+		auto cend() const { return attributes.cend(); }
+
+		// Для non-const итерации
+		auto begin() { return attributes.begin(); }
+		auto end() { return attributes.end(); }
+
 	private:
-		friend std::ostream& operator<<(std::ostream& os, const AttributeReflector& reflector) {
+		friend std::ostream& operator<<(std::ostream& os, const attribute_reflector& reflector) {
 			os << "this shader have " << reflector.getAttributesSize() << " attributes:\n";
 			for (const auto& [name, attribute] : reflector.attributes) {
 				os << "  " << attribute.name << ": {\n\tlocation: " << attribute.location;

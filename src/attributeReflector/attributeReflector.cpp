@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace shader {
-	void AttributeReflector::reflect(GLuint programId) {
+	void attribute_reflector::reflect(GLuint programId) {
 		GLint numAttributes = 0;
 		glGetProgramiv(programId, GL_ACTIVE_ATTRIBUTES, &numAttributes);
 		if (numAttributes == 0) return;
@@ -27,7 +27,7 @@ namespace shader {
 		}
 	}
 
-	const AttributeInfo& AttributeReflector::operator[](const std::string& name) const {
+	const AttributeInfo& attribute_reflector::operator[](const std::string& name) const {
 		auto iter = attributes.find(name);
 		if (iter == attributes.end()) {
 			std::cerr << ("this attribute doesn't exist in this shader: " + name);
@@ -36,7 +36,7 @@ namespace shader {
 		return iter->second;
 	}
 
-	const AttributeInfo& AttributeReflector::getAttribute(const std::string& name) const {
+	const AttributeInfo& attribute_reflector::getAttribute(const std::string& name) const {
 		auto iter = attributes.find(name);
 		if (iter == attributes.end()) throw std::out_of_range(("this attribute doesn't exist in this shader: " + name));
 		return iter->second;

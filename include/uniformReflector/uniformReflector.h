@@ -30,6 +30,17 @@ namespace shader {
 		uniform_reflector& operator=(uniform_reflector&&) = default;
 		uniform_reflector(uniform_reflector&&) = default;
 
+		const auto& get_uniforms() const { return uniforms; }
+		// Для const итерации
+		auto begin() const { return uniforms.begin(); }
+		auto end() const { return uniforms.end(); }
+		auto cbegin() const { return uniforms.cbegin(); }
+		auto cend() const { return uniforms.cend(); }
+
+		// Для non-const итерации
+		auto begin() { return uniforms.begin(); }
+		auto end() { return uniforms.end(); }
+
 	private:
 		void reflectUniforms(GLint newId);
 		friend std::ostream& operator<<(std::ostream& os, const uniform_reflector& reflector);

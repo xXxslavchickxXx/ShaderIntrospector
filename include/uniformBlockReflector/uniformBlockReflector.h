@@ -30,6 +30,17 @@ namespace shader {
 		void reflect(GLuint programId);
 		void reflectMembers(GLuint blockIndex, uniform_block_info& info, GLint programId);
 
+		const auto& get_blocks() const { return blocks; }
+		// Для const итерации
+		auto begin() const { return blocks.begin(); }
+		auto end() const { return blocks.end(); }
+		auto cbegin() const { return blocks.cbegin(); }
+		auto cend() const { return blocks.cend(); }
+
+		// Для non-const итерации
+		auto begin() { return blocks.begin(); }
+		auto end() { return blocks.end(); }
+
 	private:
 		friend std::ostream& operator<<(std::ostream& os, const uniform_block_reflector& reflector);
 	};
