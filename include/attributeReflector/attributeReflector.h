@@ -6,30 +6,24 @@
 #include <unordered_map>
 
 #include <toString/toString.h>
+#include <attributeReflector/attribute/attribute_entry.h>
 
 namespace shader {
-	struct AttributeInfo {
-		std::string name;
-		GLint location;
-		GLint size;
-		GLenum type;
-	};
-
 	class attribute_reflector {
-		std::unordered_map<std::string, AttributeInfo> attributes;
+		std::unordered_map<std::string, attribute_entry> attributes;
 
 	public:
-		attribute_reflector(GLuint programId) { reflect(programId); }
+		attribute_reflector(GLint programId) { reflect(programId); }
 
 		attribute_reflector(const attribute_reflector&) = delete;
 		attribute_reflector& operator=(const attribute_reflector&) = delete;
 		attribute_reflector(attribute_reflector&&) = default;
 		attribute_reflector& operator=(attribute_reflector&&) = default;
 
-		const AttributeInfo& operator[](const std::string& name) const;
-		const AttributeInfo& getAttribute(const std::string& name) const;
+		const attribute_entry& operator[](const std::string& name) const;
+		const attribute_entry& getAttribute(const std::string& name) const;
 
-		void reflect(GLuint programId);
+		void reflect(GLint programId);
 
 		size_t getAttributesSize() const { return attributes.size(); }
 
@@ -45,15 +39,6 @@ namespace shader {
 		auto end() { return attributes.end(); }
 
 	private:
-		friend std::ostream& operator<<(std::ostream& os, const attribute_reflector& reflector) {
-			os << "this shader have " << reflector.getAttributesSize() << " attributes:\n";
-			for (const auto& [name, attribute] : reflector.attributes) {
-				os << "  " << attribute.name << ": {\n\tlocation: " << attribute.location;
-				os << "\n\tsize: " << attribute.size;
-				os << "\n\ttype: " << toString(attribute.type);
-				os << "\n  }\n";
-			}
-			return os;
-		}
+		friend std::ostream& operator<<(std::ostream& os, const attribute_reflector& reflector);
 	};
 }

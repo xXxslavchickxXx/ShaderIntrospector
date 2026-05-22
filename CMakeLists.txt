@@ -16,7 +16,7 @@ set(INTROSPECTOR_LIB_HEADERS
     "include/tools.h"
     "include/uniformBlockReflector/uniformBlockReflector.h"
     "include/uniformBlockReflector/uniformBlockInfo.h"
- "include/AGreflection.h")
+ "include/AGreflection.h" "include/attributeReflector/attribute/attribute_entry.h")
 
 # Для удобства задаю все спп файлы в одну переменную
 set(INTROSPECTOR_LIB_CPP
@@ -24,7 +24,7 @@ set(INTROSPECTOR_LIB_CPP
 	${CMAKE_CURRENT_SOURCE_DIR}/src/uniformReflector/uniformReflector.cpp
     "src/uniformReflector/uniform/uniform_entry.cpp"
     "src/uniformBlockReflector/uniformBlockReflector.cpp"
-  "src/uniformBlockReflector/uniformBlockInfo.cpp")
+  "src/uniformBlockReflector/uniformBlockInfo.cpp" "src/attributeReflector/attribute/attribute_entry.cpp")
 
 # Создаю саму либу
 add_library(shaderIntrospector STATIC

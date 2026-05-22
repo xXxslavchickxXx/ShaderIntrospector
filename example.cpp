@@ -15,6 +15,7 @@ int main() {
     auto program = shader::ShaderProgram::from_path("assets/shaders/testV.glsl", "assets/shaders/testF.glsl");
     
     auto attribref = shader::attribute_reflector(program.getId());
+    std::cout << attribref;
 
     for (auto [name, info] : attribref.get_attributes()) {
 
