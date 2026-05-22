@@ -12,7 +12,7 @@ namespace shader {
 
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
-            GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
+            GLint indexedLoc = glGetAttribLocation(programId, indexedName.c_str());
             return attribute_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
@@ -28,7 +28,7 @@ namespace shader {
 
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
-            GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
+            GLint indexedLoc = glGetAttribLocation(programId, indexedName.c_str());
             return attribute_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
@@ -40,7 +40,7 @@ namespace shader {
 
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
-            GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
+            GLint indexedLoc = glGetAttribLocation(programId, indexedName.c_str());
             return attribute_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
@@ -56,7 +56,7 @@ namespace shader {
 
         if (elements > 1) {
             std::string indexedName = name + "[" + std::to_string(index) + "]";
-            GLint indexedLoc = glGetUniformLocation(programId, indexedName.c_str());
+            GLint indexedLoc = glGetAttribLocation(programId, indexedName.c_str());
             return attribute_entry(indexedName, indexedLoc, type, elements, programId);
         }
 
