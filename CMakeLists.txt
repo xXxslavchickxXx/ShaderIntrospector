@@ -19,7 +19,8 @@ set(INTROSPECTOR_LIB_HEADERS
     "include/templates/consoleTools.h"
     
     "include/attributeReflector/attributeHandle.h"
- "include/AGreflection.h"   "include/templates/template_iterator.h" "include/templates/opengl_iterator.h")
+ "include/AGreflection.h"   "include/templates/template_iterator.h" "include/templates/opengl_iterator.h" "include/uniformBlockReflector/uniformBlockHandle.h" "include/uniformBlockReflector/uniformBlockMember.h"
+ "include/uniformBlockReflector/uniformBlockIterator.h")
 
 # Для удобства задаю все спп файлы в одну переменную
 set(INTROSPECTOR_LIB_CPP

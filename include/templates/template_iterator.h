@@ -6,30 +6,6 @@
 #include <iostream>
 #include <vector>
 
-class iterable_base {
-public:
-    virtual ~iterable_base() = default;
-    virtual size_t size() const = 0;
-    virtual std::string get_name(size_t index) const = 0;
-    virtual void print(std::ostream& os, size_t index, int indent) const = 0;
-
-    friend std::ostream& operator<<(std::ostream& os, const iterable_base& obj) {
-        auto cursor = get_cursor_position();
-        obj.print_title(os);
-
-        for (size_t i = 0; i < obj.size(); i++) {
-            os << std::string(cursor.x, ' ') << "-> " << obj.get_name(i) << "\n";
-            obj.print(os, i, cursor.x + 4);
-        }
-        return os;
-    }
-
-protected:
-    virtual void print_title(std::ostream& os) const {
-        os << "--- iterable object ---\n";
-    }
-};
-
 template<typename Derived, typename ContainerType, typename OperArg, typename EntryType>
 class template_container_iterator {
 protected:
@@ -73,6 +49,9 @@ class template_iterator : public template_container_iterator<Derived, std::vecto
 
 public:
     using Base::Base;
+
+    EntryType& operator->() { return this->entries[0]; }
+    operator EntryType& () { return this->entries[0]; }
 
     void add_entry(EntryType&& entry) { this->entries.push_back(std::forward<EntryType>(entry)); }
 };

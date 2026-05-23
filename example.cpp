@@ -13,15 +13,18 @@ int main() {
     glewInit();
 
     auto program = shader::ShaderProgram::from_path("assets/shaders/testV.glsl", "assets/shaders/testF.glsl");
-    
+    // Юниформ блок
+    auto uniblockref = shader::uniform_block_reflector(program.getId());
+    std::cout << uniblockref["CameraBlock"];
+
     // Атрибуты
     auto attribref = shader::attribute_reflector(program.getId());
-    std::cout << attribref;
+    //std::cout << attribref;
 
-    // Рабочий блок
+    // Юниформы
     auto uniref = shader::uniform_reflector(program.getId());
     uniref["jopa"][0] = 4;
     uniref["jopa"][1] = 7;
     uniref["projection"] = glm::mat4(1.f);
-    std::cout << uniref;
+    //std::cout << uniref;
 }
