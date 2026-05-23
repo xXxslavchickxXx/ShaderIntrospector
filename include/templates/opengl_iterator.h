@@ -9,6 +9,7 @@ class opengl_template_iterator : public template_iterator<Derived, EntryType> {
 	using Base = template_iterator<Derived, EntryType>;
 
 protected:
+	using Base::entries;
 	GLint program;
 
 public:
@@ -19,6 +20,15 @@ public:
 	opengl_template_iterator& operator=(opengl_template_iterator&&) = default;
 	opengl_template_iterator(const opengl_template_iterator&) = default;
 	opengl_template_iterator& operator = (const opengl_template_iterator&) = default;
+	
+	GLint byte_size() const {
+		GLint common_size = 0;
+		for (auto entry : this->entries) {
+			common_size += entry.byte_size;
+		}
+		return common_size;
+	}
+	size_t size() const { return this->entries.size(); }
 
 	void print(std::ostream& os, int indent = 0) const override {
 		os << std::string(indent, ' ') << this->name << " @ program " << program << "\n";

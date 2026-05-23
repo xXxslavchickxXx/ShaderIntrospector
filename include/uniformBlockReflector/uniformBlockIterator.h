@@ -15,8 +15,6 @@ namespace shader {
             this->add_entry(std::move(block));
         }
 
-        size_t size() const { return this->entries.size(); }
-
         void print(std::ostream& os, int indent = 0) const override {
             os << std::string(indent, ' ') << "Uniform Block Array: " << this->name << "\n";
             os << std::string(indent + 2, ' ') << "Count: " << this->entries.size() << "\n";
