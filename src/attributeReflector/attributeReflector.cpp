@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <format>
 
 namespace shader {
 	void attribute_reflector::reflect(GLint programId) {
@@ -21,26 +22,35 @@ namespace shader {
 			glGetActiveAttrib(programId, i, nameBuffer.size(), &length, &elements, &type, nameBuffer.data());
 
 			std::string name(nameBuffer.data(), length);
+
 			if (elements > 1) {
 				name = name.substr(0, name.find("[0]"));
+				attributes[name] = attribute_iterator(std::format("{} ({}[{}])", name, toString(type), elements), programId);
+
+				for (size_t i = 0; i < elements; i++) {
+					std::string iter_name = std::format("{}[{}]", name, i);
+					GLint location = glGetAttribLocation(programId, iter_name.c_str());
+					attributes[name].add_entry(attribute_handle(std::format("[{}]", i), location, type));
+				}
 			}
-
-			GLint location = glGetAttribLocation(programId, name.c_str());
-
-			attributes[name] = attribute_entry{ name, location, type, elements, programId };
+			else {
+				attributes[name] = attribute_iterator(std::format("{} ({})", name, toString(type)), programId);
+				GLint location = glGetAttribLocation(programId, name.c_str());
+				attributes[name].add_entry(attribute_handle(name, location, type));
+			}
 		}
 	}
 
-	const attribute_entry& attribute_reflector::operator[](const std::string& name) const {
+	const attribute_iterator& attribute_reflector::operator[](const std::string& name) const {
 		auto iter = attributes.find(name);
 		if (iter == attributes.end()) {
 			std::cerr << ("this attribute doesn't exist in this shader: " + name);
-			return attribute_entry();
+			return attribute_iterator();
 		}
 		return iter->second;
 	}
 
-	const attribute_entry& attribute_reflector::getAttribute(const std::string& name) const {
+	const attribute_iterator& attribute_reflector::get_attribute(const std::string& name) const {
 		auto iter = attributes.find(name);
 		if (iter == attributes.end()) throw std::out_of_range(("this attribute doesn't exist in this shader: " + name));
 		return iter->second;
@@ -56,7 +66,7 @@ namespace shader {
 		os << "\n";
 		size_t count = 0;
 		for (const auto& [name, unit] : reflector.attributes) {
-			os << unit;
+			os << unit << '\n';
 			if (++count < reflector.attributes.size()) {
 				os << "";
 			}

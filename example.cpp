@@ -23,9 +23,6 @@ int main() {
     for (auto [name, info] : attribref) {
 
     }
-
-    auto uniblocref = shader::uniform_block_reflector(program.getId());
-    std::cout << uniblocref["CameraBlock"];
     // Рабочий блок
     //auto uniref = shader::uniform_reflector(program.getId());
     //uniref["jopa"][0] = 4;

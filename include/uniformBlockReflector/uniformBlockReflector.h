@@ -12,6 +12,7 @@
 namespace shader {
 	struct uniform_block_member;
 	struct uniform_block_info;
+	struct uniform_block_iterator;
 
 	class uniform_block_reflector {
 		std::unordered_map<std::string, uniform_block_info> blocks;
