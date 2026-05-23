@@ -12,7 +12,7 @@ protected:
 	GLint program;
 
 public:
-	opengl_template_iterator() : Base() {}
+	opengl_template_iterator() : Base(), program(-1) {}
 	opengl_template_iterator(const std::string& name, GLint program) : Base(name), program(program) {}
 
 	opengl_template_iterator(opengl_template_iterator&&) = default;

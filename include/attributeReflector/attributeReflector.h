@@ -7,7 +7,7 @@
 
 #include <toString/toString.h>
 
-#include <attributeReflector/attribute/attributeHandle.h>
+#include <attributeReflector/attributeHandle.h>
 
 namespace shader {
 	class attribute_reflector {

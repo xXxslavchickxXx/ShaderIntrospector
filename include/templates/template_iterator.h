@@ -30,42 +30,49 @@ protected:
     }
 };
 
-template<typename Derived, typename EntryType>
-class template_iterator {
+template<typename Derived, typename ContainerType, typename OperArg, typename EntryType>
+class template_container_iterator {
 protected:
-    std::vector<EntryType> entries;
+    ContainerType entries;
+public:
     std::string name;
 
 public:
-    template_iterator() = default;
-    template_iterator(const std::string& name) : name(name) {}
-    
-    template_iterator(template_iterator&&) = default;
-    template_iterator& operator=(template_iterator&&) = default;
-    template_iterator(const template_iterator&) = default;
-    template_iterator& operator=(const template_iterator&) = default;
+    using entry_type = EntryType;
 
-    void add_entry(EntryType&& entry) { entries.push_back(std::move(entry)); }
+    template_container_iterator() = default;
+    template_container_iterator(const std::string& name) : name(name) {}
+
+    template_container_iterator(template_container_iterator&&) = default;
+    template_container_iterator& operator=(template_container_iterator&&) = default;
+    template_container_iterator(const template_container_iterator&) = default;
+    template_container_iterator& operator=(const template_container_iterator&) = default;
 
     size_t size() const { return entries.size(); }
-    const EntryType& operator[](size_t i) const { return entries[i]; }
-    EntryType& operator[](size_t i) { return entries[i]; }
+
+    const EntryType& operator[](OperArg i) const { return entries[i]; }
+    EntryType& operator[](OperArg i) { return entries[i]; }
 
     auto begin() { return entries.begin(); }
     auto end() { return entries.end(); }
     auto begin() const { return entries.begin(); }
     auto end() const { return entries.end(); }
 
-    // Вывод
-    virtual void print(std::ostream& os, int indent = 0) const {
-        os << std::string(indent, ' ') << name << ":\n";
-        for (const auto& entry : entries) {
-            os << std::string(indent + 2, ' ') << "-> " << entry << "\n";
-        }
-    }
+    virtual void print(std::ostream& os, int indent = 0) const = 0;
 
-    friend std::ostream& operator<<(std::ostream& os, const template_iterator& it) {
+    friend std::ostream& operator<<(std::ostream& os, const template_container_iterator& it) {
         it.print(os);
         return os;
     }
+};
+
+template<typename Derived, typename EntryType>
+class template_iterator : public template_container_iterator<Derived, std::vector<EntryType>, size_t, EntryType>
+{
+    using Base = template_container_iterator<Derived, std::vector<EntryType>, size_t, EntryType>;
+
+public:
+    using Base::Base;
+
+    void add_entry(EntryType&& entry) { this->entries.push_back(std::forward<EntryType>(entry)); }
 };

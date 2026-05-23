@@ -4,7 +4,7 @@
 #include <tools.h>
 
 namespace shader {
-	class attribute_handle {
+	struct attribute_handle {
 		std::string name;
 		GLint location;
 		GLenum type;

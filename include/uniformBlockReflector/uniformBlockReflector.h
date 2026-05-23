@@ -1,48 +1,54 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <ostream>
-#include <string>
+#include <templates/template_iterator.h>
 #include <unordered_map>
+#include <string>
 #include <vector>
-
-#include <toString/toString.h>
 #include <uniformBlockReflector/uniformBlockInfo.h>
 
 namespace shader {
-	struct uniform_block_member;
-	struct uniform_block_info;
-	struct uniform_block_iterator;
 
-	class uniform_block_reflector {
-		std::unordered_map<std::string, uniform_block_info> blocks;
+    class uniform_block_reflector : public template_container_iterator<
+        uniform_block_reflector,
+        std::unordered_map<std::string, uniform_block_info>,
+        const std::string&,
+        uniform_block_info>
+    {
+        using Base = template_container_iterator<uniform_block_reflector, std::unordered_map<std::string, uniform_block_info>, const std::string&, uniform_block_info>;
 
-	public:
-		uniform_block_reflector(GLuint programId);
+        GLuint programId = 0;
 
-		uniform_block_reflector(const uniform_block_reflector&) = delete;
-		uniform_block_reflector& operator=(const uniform_block_reflector&) = delete;
-		uniform_block_reflector(uniform_block_reflector&&) = default;
-		uniform_block_reflector& operator=(uniform_block_reflector&&) = default;
+    public:
+        uniform_block_reflector() = default;
+        explicit uniform_block_reflector(GLuint programId);
 
-		const uniform_block_info& operator[](const std::string& name) const;
-		const uniform_block_info& getBlock(const std::string& name) const;
+        void reflect(GLuint programId);
+        void setBinding(const std::string& blockName, GLuint bindingPoint);
 
-		void reflect(GLuint programId);
-		void reflectMembers(GLuint blockIndex, uniform_block_info& info, GLint programId);
+        const uniform_block_info& getBlock(const std::string& name) const {
+            auto it = this->entries.find(name);
+            if (it == this->entries.end()) {
+                throw std::out_of_range("Block not found: " + name);
+            }
+            return it->second;
+        }
 
-		const auto& get_blocks() const { return blocks; }
-		// Для const итерации
-		auto begin() const { return blocks.begin(); }
-		auto end() const { return blocks.end(); }
-		auto cbegin() const { return blocks.cbegin(); }
-		auto cend() const { return blocks.cend(); }
+        using Base::operator[];
 
-		// Для non-const итерации
-		auto begin() { return blocks.begin(); }
-		auto end() { return blocks.end(); }
+        void print(std::ostream& os, int indent = 0) const override {
+            os << std::string(indent, ' ') << "=== Uniform Block Reflector ===\n";
+            os << std::string(indent, ' ') << "Program ID: " << programId << "\n";
+            os << std::string(indent, ' ') << "Blocks:\n";
+            for (const auto& [name, block] : this->entries) {
+                block.print(os, indent + 2);
+                os << "\n";
+            }
+        }
 
-	private:
-		friend std::ostream& operator<<(std::ostream& os, const uniform_block_reflector& reflector);
-	};
+        friend std::ostream& operator<<(std::ostream& os, const uniform_block_reflector& reflector) {
+            reflector.print(os);
+            return os;
+        }
+    };
+
 }

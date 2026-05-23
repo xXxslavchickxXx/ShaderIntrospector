@@ -14,19 +14,14 @@ int main() {
 
     auto program = shader::ShaderProgram::from_path("assets/shaders/testV.glsl", "assets/shaders/testF.glsl");
     
+    // Атрибуты
     auto attribref = shader::attribute_reflector(program.getId());
     std::cout << attribref;
 
-    for (auto [name, info] : attribref.get_attributes()) {
-
-    }
-    for (auto [name, info] : attribref) {
-
-    }
     // Рабочий блок
-    //auto uniref = shader::uniform_reflector(program.getId());
-    //uniref["jopa"][0] = 4;
-    //uniref["jopa"][1] = 7;
-    //uniref["projection"] = glm::mat4(1.f);
-    //std::cout << uniref;
+    auto uniref = shader::uniform_reflector(program.getId());
+    uniref["jopa"][0] = 4;
+    uniref["jopa"][1] = 7;
+    uniref["projection"] = glm::mat4(1.f);
+    std::cout << uniref;
 }
