@@ -2,6 +2,7 @@
 
 #include <templates/opengl_iterator.h>
 #include <toString/toString.h>
+#include <tools.h>
 
 #include <uniformBlockReflector/uniformBlockHandle.h>
 
@@ -27,7 +28,7 @@ public:
             // Массив: создаём handle для каждого элемента
             for (int i = 0; i < size; ++i) {
                 std::string elemName = name + "[" + std::to_string(i) + "]";
-                this->add_entry(uniform_block_handle(elemName, offset + i * arrayStride, type, 1));
+                this->add_entry(uniform_block_handle(elemName, offset + i * arrayStride, type, shader::get_gl_type_size(type)));
             }
         }
         else {
