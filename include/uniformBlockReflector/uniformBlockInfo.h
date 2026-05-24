@@ -16,6 +16,8 @@ public:
     GLint byte_size = 0;
     GLint activeUniforms = 0;
 
+    GLint offset = 0;
+
     uniform_block_info() = default;
     uniform_block_info(const std::string& name) : Base(name) {}
 

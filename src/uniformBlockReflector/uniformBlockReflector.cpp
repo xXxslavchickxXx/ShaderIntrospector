@@ -73,6 +73,8 @@ namespace shader {
                 glGetActiveUniformsiv(programId, elementBlock.activeUniforms, indices.data(),
                     GL_UNIFORM_IS_ROW_MAJOR, isRowMajors.data());
 
+                elementBlock.offset = index * elementBlock.byte_size;
+
                 for (size_t i = 0; i < uniformIndices.size(); ++i) {
                     GLsizei length = 0;
                     GLint size = 0;
