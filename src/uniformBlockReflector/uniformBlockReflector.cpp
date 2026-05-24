@@ -50,8 +50,6 @@ namespace shader {
                 uniform_block_info elementBlock(fullName);
                 elementBlock.index = blockIdx;
 
-                std::cout << index << '\n';
-
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &elementBlock.byte_size);
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_BINDING, &elementBlock.binding);
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &elementBlock.activeUniforms);
