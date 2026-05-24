@@ -15,7 +15,12 @@ int main() {
     auto program = shader::ShaderProgram::from_path("assets/shaders/testV.glsl", "assets/shaders/testF.glsl");
     // Юниформ блок
     auto uniblockref = shader::uniform_block_reflector(program.getId());
-    std::cout << uniblockref["CameraBlock"];
+    try {
+        std::cout << uniblockref["CameraBlock"]->["uView"][2].name;
+    }
+    catch (std::exception& e) {
+        std::cerr << e.what();
+    }
 
     // Атрибуты
     auto attribref = shader::attribute_reflector(program.getId());

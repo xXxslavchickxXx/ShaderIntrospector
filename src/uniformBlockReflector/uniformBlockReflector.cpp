@@ -1,5 +1,4 @@
 #include <uniformBlockReflector/uniformBlockReflector.h>
-#include <uniformBlockReflector/uniformBlockInfo.h>
 #include <toString/toString.h>
 #include <tools.h>
 #include <algorithm>
@@ -19,18 +18,13 @@ namespace shader {
         glGetProgramiv(programId, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
         if (numBlocks == 0) return;
 
-        // Временное хранилище для обычных блоков и массивов
-        std::unordered_map<std::string, std::vector<std::pair<int, uniform_block_info>>> arrayGroups;
-        std::unordered_map<std::string, uniform_block_info> singleBlocks;
-
         // Параметры для рефлексии
         GLint maxUniformNameLength = 0;
         glGetProgramiv(programId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformNameLength);
         std::vector<char> nameBuffer(maxUniformNameLength);
-        std::vector<GLuint> indices;
 
         size_t block_offset = 0;
-        std::string last_block_name;
+
         for (GLuint blockIdx = 0; blockIdx < (GLuint)numBlocks; ++blockIdx) {
             // Получаем имя блока
             GLint nameLength = 0;
@@ -39,134 +33,101 @@ namespace shader {
             glGetActiveUniformBlockName(programId, blockIdx, nameLength, nullptr, blockNameBuffer.data());
             std::string fullName(blockNameBuffer.data());
 
-            // Проверяем, элемент ли это массива блоков
+            // Определяем, массив это или нет
             size_t bracketPos = fullName.find('[');
-            if (bracketPos != std::string::npos) {
-                // Это элемент массива: "name[index]"
-                std::string baseName = fullName.substr(0, bracketPos);
-                int index = std::stoi(fullName.substr(bracketPos + 1, fullName.find(']') - bracketPos - 1));
+            bool isArrayBlock = (bracketPos != std::string::npos);
 
-                // Создаём блок для этого элемента
-                uniform_block_info elementBlock(fullName);
-                elementBlock.index = blockIdx;
+            // Базовое имя (без индекса для массива)
+            std::string baseName = isArrayBlock ? fullName.substr(0, bracketPos) : fullName;
 
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &elementBlock.byte_size);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_BINDING, &elementBlock.binding);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &elementBlock.activeUniforms);
+            // Создаем блок
+            uniform_block_data_info block(baseName);
+            block.index = blockIdx;
+            block.offset = isArrayBlock ? block_offset : 0;
 
-                // Рефлексим члены блока
-                std::vector<GLuint> uniformIndices(elementBlock.activeUniforms);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,
-                    reinterpret_cast<GLint*>(uniformIndices.data()));
+            glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &block.byte_size);
+            glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_BINDING, &block.binding);
+            glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &block.uniforms);
 
-                indices.resize(elementBlock.activeUniforms);
-                std::copy(uniformIndices.begin(), uniformIndices.end(), indices.begin());
+            // Рефлексим члены блока (общая логика)
+            reflectBlockMembers(programId, blockIdx, block, maxUniformNameLength, nameBuffer);
 
-                std::vector<GLint> offsets(elementBlock.activeUniforms);
-                std::vector<GLint> arrayStrides(elementBlock.activeUniforms);
-                std::vector<GLint> matrixStrides(elementBlock.activeUniforms);
-                std::vector<GLint> isRowMajors(elementBlock.activeUniforms);
+            // Сохраняем блок
+            this->entries[baseName].add_entry(std::move(block));
 
-                glGetActiveUniformsiv(programId, elementBlock.activeUniforms, indices.data(),
-                    GL_UNIFORM_OFFSET, offsets.data());
-                glGetActiveUniformsiv(programId, elementBlock.activeUniforms, indices.data(),
-                    GL_UNIFORM_ARRAY_STRIDE, arrayStrides.data());
-                glGetActiveUniformsiv(programId, elementBlock.activeUniforms, indices.data(),
-                    GL_UNIFORM_MATRIX_STRIDE, matrixStrides.data());
-                glGetActiveUniformsiv(programId, elementBlock.activeUniforms, indices.data(),
-                    GL_UNIFORM_IS_ROW_MAJOR, isRowMajors.data());
-
-                elementBlock.offset = index * elementBlock.byte_size;
-
-                for (size_t i = 0; i < uniformIndices.size(); ++i) {
-                    GLsizei length = 0;
-                    GLint size = 0;
-                    GLenum type = 0;
-                    glGetActiveUniform(programId, uniformIndices[i], maxUniformNameLength,
-                        &length, &size, &type, nameBuffer.data());
-                    std::string memberName(nameBuffer.data(), length);
-
-                    uniform_block_member member(
-                        memberName, type, block_offset + offsets[i], arrayStrides[i], size,
-                        isRowMajors[i] == GL_TRUE, programId
-                    );
-                    elementBlock.add_member(std::move(member));
-                }
-
-                arrayGroups[baseName].push_back({ index, std::move(elementBlock) });
-
-                block_offset += elementBlock.byte_size;
+            // Обновляем offset для следующего элемента массива
+            if (isArrayBlock) {
+                block_offset += block.byte_size;
             }
             else {
                 block_offset = 0;
+            }
+        }
+    }
 
-                // Обычный блок (не массив)
-                uniform_block_info block(fullName);
-                block.index = blockIdx;
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &block.byte_size);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_BINDING, &block.binding);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &block.activeUniforms);
+    // Вынесенная функция для рефлексии членов блока
+    void uniform_block_reflector::reflectBlockMembers(GLuint programId, GLuint blockIdx,
+        uniform_block_data_info& block, GLint maxUniformNameLength, std::vector<char>& nameBuffer) {
 
-                std::vector<GLuint> uniformIndices(block.activeUniforms);
-                glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,
-                    reinterpret_cast<GLint*>(uniformIndices.data()));
+        std::vector<GLuint> uniforms(block.uniforms);
+        glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,
+            reinterpret_cast<GLint*>(uniforms.data()));
 
-                indices.resize(block.activeUniforms);
-                std::copy(uniformIndices.begin(), uniformIndices.end(), indices.begin());
+        std::vector<GLint> offsets(block.uniforms);
+        std::vector<GLint> elementStrides(block.uniforms);
 
-                std::vector<GLint> offsets(block.activeUniforms);
-                std::vector<GLint> arrayStrides(block.activeUniforms);
-                std::vector<GLint> matrixStrides(block.activeUniforms);
-                std::vector<GLint> isRowMajors(block.activeUniforms);
+        glGetActiveUniformsiv(programId, block.uniforms, uniforms.data(),
+            GL_UNIFORM_OFFSET, offsets.data());
+        glGetActiveUniformsiv(programId, block.uniforms, uniforms.data(),
+            GL_UNIFORM_ARRAY_STRIDE, elementStrides.data());
 
-                glGetActiveUniformsiv(programId, block.activeUniforms, indices.data(),
-                    GL_UNIFORM_OFFSET, offsets.data());
-                glGetActiveUniformsiv(programId, block.activeUniforms, indices.data(),
-                    GL_UNIFORM_ARRAY_STRIDE, arrayStrides.data());
-                glGetActiveUniformsiv(programId, block.activeUniforms, indices.data(),
-                    GL_UNIFORM_MATRIX_STRIDE, matrixStrides.data());
-                glGetActiveUniformsiv(programId, block.activeUniforms, indices.data(),
-                    GL_UNIFORM_IS_ROW_MAJOR, isRowMajors.data());
+        for (size_t i = 0; i < uniforms.size(); ++i) {
+            GLsizei length = 0;
+            GLint elements = 0;
+            GLenum type = 0;
 
-                for (size_t i = 0; i < uniformIndices.size(); ++i) {
-                    GLsizei length = 0;
-                    GLint size = 0;
-                    GLenum type = 0;
-                    glGetActiveUniform(programId, uniformIndices[i], maxUniformNameLength,
-                        &length, &size, &type, nameBuffer.data());
-                    std::string memberName(nameBuffer.data(), length);
+            glGetActiveUniform(programId, uniforms[i], maxUniformNameLength,
+                &length, &elements, &type, nameBuffer.data());
 
-                    uniform_block_member member(
-                        memberName, type, block_offset + offsets[i], arrayStrides[i], size,
-                        isRowMajors[i] == GL_TRUE, programId
-                    );
-                    block.add_member(std::move(member));
+            std::string uniformName(nameBuffer.data(), length);
+
+            // Убираем префикс с точкой (часть блока)
+            size_t dotPos = uniformName.find('.');
+            if (dotPos != std::string::npos) {
+                uniformName = uniformName.substr(dotPos + 1);
+            }
+
+            // Убираем суффикс массива
+            size_t bracketPos = uniformName.find('[');
+            if (bracketPos != std::string::npos) {
+                uniformName = uniformName.substr(0, bracketPos);
+            }
+
+            uniform_block_view_info uniform(uniformName, programId);
+            uniform.type = type;
+            uniform.offset = offsets[i] + block.offset;
+            uniform.elementStride = elementStrides[i];
+
+            if (elements > 1) {
+                // Массив внутри блока
+                for (size_t j = 0; j < elements; ++j) {
+                    uniform_block_field_info uniform_field(std::format("{}[{}]", uniformName, j));
+                    uniform_field.type = type;
+                    uniform_field.byte_size = get_gl_type_size(type);
+                    uniform_field.offset = uniform.offset + j * elementStrides[i];
+                    uniform.add_entry(std::move(uniform_field));
                 }
-                singleBlocks[fullName] = std::move(block);
             }
-        }
-
-        // Собираем массивы блоков в uniform_block_iterator
-        for (auto& [baseName, elements] : arrayGroups) {
-            // Сортируем по индексу
-            std::sort(elements.begin(), elements.end(),
-                [](const auto& a, const auto& b) { return a.first < b.first; });
-
-            uniform_block_iterator blockArray(baseName, programId);
-            for (auto& [idx, element] : elements) {
-                blockArray.add_block(std::move(element));
+            else {
+                // Обычная переменная
+                uniform_block_field_info uniform_field(uniformName);
+                uniform_field.type = type;
+                uniform_field.byte_size = get_gl_type_size(type);
+                uniform_field.offset = uniform.offset;
+                uniform.add_entry(std::move(uniform_field));
             }
 
-            this->entries[baseName] = std::move(blockArray);
-        }
-
-        // Добавляем обычные блоки как итераторы с одним элементом
-        for (auto& [name, block] : singleBlocks) {
-            uniform_block_iterator singleIterator(name, programId);
-            singleIterator.index = block.index;
-            singleIterator.binding = block.binding;
-            singleIterator.add_block(std::move(block));
-            this->entries[name] = std::move(singleIterator);
+            block.add_member(std::move(uniform));
         }
     }
 

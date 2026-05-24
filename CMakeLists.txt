@@ -15,12 +15,12 @@ set(INTROSPECTOR_LIB_HEADERS
     "include/uniformReflector/uniform/uniform_entry.h"
     "include/tools.h"
     "include/uniformBlockReflector/uniformBlockReflector.h"
-    "include/uniformBlockReflector/uniformBlockInfo.h"
-    "include/templates/consoleTools.h"
+    "include/uniformBlockReflector/uniformBlockData.h"
+    "include/consoleTools.h"
     
     "include/attributeReflector/attributeHandle.h"
- "include/AGreflection.h"   "include/templates/template_iterator.h" "include/templates/opengl_iterator.h" "include/uniformBlockReflector/uniformBlockHandle.h" "include/uniformBlockReflector/uniformBlockMember.h"
- "include/uniformBlockReflector/uniformBlockIterator.h")
+ "include/AGreflection.h"   "include/templates/template_iterator.h" "include/templates/opengl_iterator.h" "include/uniformBlockReflector/uniformBlockField.h" "include/uniformBlockReflector/uniformBlockView.h"
+ "include/uniformBlockReflector/uniformBlockSequence.h")
 
 # Для удобства задаю все спп файлы в одну переменную
 set(INTROSPECTOR_LIB_CPP
