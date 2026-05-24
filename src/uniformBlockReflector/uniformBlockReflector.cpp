@@ -140,7 +140,7 @@ namespace shader {
         // Для каждого элемента массива блоков
         for (size_t i = 0; i < it->second.size(); ++i) {
             glUniformBlockBinding(programId, it->second[i].index, bindingPoint);
-            it->second[i].binding = static_cast<GLint>(bindingPoint);
+            it->second.get(i).binding = static_cast<GLint>(bindingPoint);
         }
     }
 

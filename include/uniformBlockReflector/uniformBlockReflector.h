@@ -33,7 +33,7 @@ namespace shader {
         void setBinding(const std::string& blockName, GLuint bindingPoint);
 
         // Доступ к блоку (обычному или массиву)
-        uniform_block_sequence_info& operator[](const std::string& name) {
+        const uniform_block_sequence_info& operator[](const std::string& name) {
             return this->entries[name];
         }
 

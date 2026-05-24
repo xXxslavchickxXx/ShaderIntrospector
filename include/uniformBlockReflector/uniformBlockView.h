@@ -23,6 +23,14 @@ public:
         return this->entries[0];
     }
 
+    uniform_block_field_info operator[](size_t i) {
+        return this->entries[i];
+    }
+
+    uniform_block_field_info operator[](size_t i) const {
+        return this->entries.at(i);
+    }
+
     void print(std::ostream& os, int indent = 0) const override {
         os << std::string(indent, ' ') << this->name;
         if (size() > 1) os << "[" << size() << "]";
