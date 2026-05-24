@@ -134,7 +134,6 @@ namespace shader {
                     );
                     block.add_member(std::move(member));
                 }
-
                 singleBlocks[fullName] = std::move(block);
             }
         }
@@ -156,6 +155,8 @@ namespace shader {
         // Добавляем обычные блоки как итераторы с одним элементом
         for (auto& [name, block] : singleBlocks) {
             uniform_block_iterator singleIterator(name, programId);
+            singleIterator.index = block.index;
+            singleIterator.binding = block.binding;
             singleIterator.add_block(std::move(block));
             this->entries[name] = std::move(singleIterator);
         }

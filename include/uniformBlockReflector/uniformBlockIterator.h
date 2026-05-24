@@ -8,6 +8,9 @@ namespace shader {
         using Base = opengl_template_iterator<uniform_block_iterator, uniform_block_info>;
 
     public:
+        GLuint index = 0;
+        GLint binding = 0;
+
         uniform_block_iterator() = default;
         uniform_block_iterator(const std::string& name, GLint program) : Base(name, program) {}
 
