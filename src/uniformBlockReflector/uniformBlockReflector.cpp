@@ -54,6 +54,7 @@ namespace shader {
 
             // Сохраняем блок
             this->entries[baseName].add_entry(std::move(block));
+            this->entries[baseName].offset = block_offset;
 
             // Обновляем offset для следующего элемента массива
             if (isArrayBlock) {

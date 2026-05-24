@@ -14,6 +14,8 @@ namespace shader {
         friend class uniform_block_reflector;
 
     public:
+        GLint offset = 0;
+
         uniform_block_sequence_info() = default;
         uniform_block_sequence_info(const std::string& name, GLint program) : Base(name, program) {}
         
