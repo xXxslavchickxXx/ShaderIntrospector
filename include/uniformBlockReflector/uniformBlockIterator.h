@@ -23,7 +23,7 @@ namespace shader {
             os << std::string(indent + 2, ' ') << "Count: " << this->entries.size() << "\n";
             for (size_t i = 0; i < this->entries.size(); ++i) {
                 os << std::string(indent + 2, ' ') << "[" << i << "]\n";
-                this->entries[0].print(os, indent + 4);
+                this->entries[i].print(os, indent + 4);
             }
         }
     };

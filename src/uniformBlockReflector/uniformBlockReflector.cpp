@@ -29,6 +29,8 @@ namespace shader {
         std::vector<char> nameBuffer(maxUniformNameLength);
         std::vector<GLuint> indices;
 
+        size_t block_offset = 0;
+        std::string last_block_name;
         for (GLuint blockIdx = 0; blockIdx < (GLuint)numBlocks; ++blockIdx) {
             // Получаем имя блока
             GLint nameLength = 0;
@@ -47,6 +49,9 @@ namespace shader {
                 // Создаём блок для этого элемента
                 uniform_block_info elementBlock(fullName);
                 elementBlock.index = blockIdx;
+
+                std::cout << index << '\n';
+
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &elementBlock.byte_size);
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_BINDING, &elementBlock.binding);
                 glGetActiveUniformBlockiv(programId, blockIdx, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &elementBlock.activeUniforms);
@@ -84,7 +89,7 @@ namespace shader {
                     std::string memberName(nameBuffer.data(), length);
 
                     uniform_block_member member(
-                        memberName, type, offsets[i], arrayStrides[i], size,
+                        memberName, type, block_offset + offsets[i], arrayStrides[i], size,
                         isRowMajors[i] == GL_TRUE, programId
                     );
                     elementBlock.add_member(std::move(member));
@@ -92,8 +97,11 @@ namespace shader {
 
                 arrayGroups[baseName].push_back({ index, std::move(elementBlock) });
 
+                block_offset += elementBlock.byte_size;
             }
             else {
+                block_offset = 0;
+
                 // Обычный блок (не массив)
                 uniform_block_info block(fullName);
                 block.index = blockIdx;
@@ -131,7 +139,7 @@ namespace shader {
                     std::string memberName(nameBuffer.data(), length);
 
                     uniform_block_member member(
-                        memberName, type, offsets[i], arrayStrides[i], size,
+                        memberName, type, block_offset + offsets[i], arrayStrides[i], size,
                         isRowMajors[i] == GL_TRUE, programId
                     );
                     block.add_member(std::move(member));
