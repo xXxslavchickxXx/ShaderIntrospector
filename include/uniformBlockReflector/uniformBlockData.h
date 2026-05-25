@@ -26,7 +26,7 @@ public:
         this->entries[member.name] = std::move(member);
     }
 
-    void print(std::ostream& os, int indent = 0) const override {
+    void print(std::ostream& os, int indent = 0) const {
         os << std::string(indent, ' ') << "Uniform Block: " << this->name << "\n";
         os << std::string(indent + 2, ' ') << "Index: " << index << "\n";
         os << std::string(indent + 2, ' ') << "Binding: " << binding << "\n";
@@ -36,5 +36,10 @@ public:
         for (const auto& [name, member] : this->entries) {
             member.print(os, indent + 4);
         }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const uniform_block_data_info& it) {
+        it.print(os);
+        return os;
     }
 };

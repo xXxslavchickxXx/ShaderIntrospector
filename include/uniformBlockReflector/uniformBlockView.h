@@ -31,7 +31,7 @@ public:
         return this->entries.at(i);
     }
 
-    void print(std::ostream& os, int indent = 0) const override {
+    void print(std::ostream& os, int indent = 0) const {
         os << std::string(indent, ' ') << this->name;
         if (size() > 1) os << "[" << size() << "]";
         os << " (" << toString(type) << ") @ offset " << offset;
@@ -46,5 +46,10 @@ public:
         for (const auto& elem : this->entries) {
             os << std::string(indent + 2, ' ') << "  - " << elem << "\n";
         }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const uniform_block_view_info& it) {
+        it.print(os);
+        return os;
     }
 };

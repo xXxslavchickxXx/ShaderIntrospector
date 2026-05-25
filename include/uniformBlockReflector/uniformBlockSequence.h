@@ -32,13 +32,18 @@ namespace shader {
             return this->entries.at(i);
         }
 
-        void print(std::ostream& os, int indent = 0) const override {
+        void print(std::ostream& os, int indent = 0) const {
             os << std::string(indent, ' ') << "Uniform Block Array: " << this->name << "\n";
             os << std::string(indent + 2, ' ') << "Count: " << this->entries.size() << "\n";
             for (size_t i = 0; i < this->entries.size(); ++i) {
                 os << std::string(indent + 2, ' ') << "[" << i << "]\n";
                 this->entries[i].print(os, indent + 4);
             }
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const uniform_block_sequence_info& it) {
+            it.print(os);
+            return os;
         }
     };
 

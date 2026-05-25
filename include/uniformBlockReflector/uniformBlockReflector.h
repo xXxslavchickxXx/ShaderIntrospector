@@ -41,7 +41,7 @@ namespace shader {
             return this->entries.at(name);
         }
 
-        void print(std::ostream& os, int indent = 0) const override {
+        void print(std::ostream& os, int indent = 0) const {
             os << std::string(indent, ' ') << "=== Uniform Block Reflector ===\n";
             os << std::string(indent, ' ') << "Program ID: " << programId << "\n";
             os << std::string(indent, ' ') << "Blocks:\n";

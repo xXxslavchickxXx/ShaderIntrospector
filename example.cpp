@@ -16,7 +16,7 @@ int main() {
     // Юниформ блок
     auto uniblockref = shader::uniform_block_reflector(program.getId());
     try {
-        std::cout << uniblockref["CameraBlock"].;
+        std::cout << uniblockref["CameraBlock"] << 1;
     }
     catch (std::exception& e) {
         std::cerr << e.what();

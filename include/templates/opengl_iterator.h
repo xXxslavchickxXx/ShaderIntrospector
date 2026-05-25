@@ -30,10 +30,15 @@ public:
 	}
 	size_t size() const { return this->entries.size(); }
 
-	void print(std::ostream& os, int indent = 0) const override {
+	void print(std::ostream& os, int indent = 0) const {
 		os << std::string(indent, ' ') << this->name << " @ program " << program << "\n";
 		for (const auto& entry : this->entries) {
 			os << std::string(indent + 2, ' ') << "-> " << entry << "\n";
 		}
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, opengl_template_iterator<Derived, EntryType>& it) {
+		it.print(os);
+		return os;
 	}
 };

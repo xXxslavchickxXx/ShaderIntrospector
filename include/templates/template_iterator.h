@@ -28,22 +28,12 @@ public:
 
     const EntryType& operator[](OperArg i) const {
         if constexpr (std::is_integral_v<OperArg>) {
-            // Для индексов (size_t)
             if (i >= entries.size()) {
                 std::cerr << "Index out of range (size=" << entries.size() << ")" << std::endl;
             }
             return entries[i];
         }
-        else {
-            // Для строковых ключей (const std::string&)
-            auto it = entries.find(i);
-            if (it == entries.end()) {
-                std::cerr << "Key not found: " << i << std::endl;
-                static EntryType empty;
-                return empty;
-            }
-            return it->second;
-        }
+        return entries[i];
     }
 
     EntryType& operator[](OperArg i) {
@@ -53,15 +43,7 @@ public:
             }
             return entries[i];
         }
-        else {
-            auto it = entries.find(i);
-            if (it == entries.end()) {
-                std::cerr << "Key not found: " << i << std::endl;
-                static EntryType empty;
-                return empty;
-            }
-            return it->second;
-        }
+        return entries[i];
     }
 
     auto begin() { return entries.begin(); }
@@ -69,10 +51,8 @@ public:
     auto begin() const { return entries.begin(); }
     auto end() const { return entries.end(); }
 
-    virtual void print(std::ostream& os, int indent = 0) const = 0;
-
-    friend std::ostream& operator<<(std::ostream& os, const template_container_iterator& it) {
-        it.print(os);
+    friend std::ostream& operator<<(std::ostream& os, template_container_iterator<Derived, ContainerType, OperArg, EntryType> var) {
+        os << var.name;
         return os;
     }
 };
