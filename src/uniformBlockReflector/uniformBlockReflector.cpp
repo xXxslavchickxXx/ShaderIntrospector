@@ -41,7 +41,7 @@ namespace shader {
             std::string baseName = isArrayBlock ? fullName.substr(0, bracketPos) : fullName;
 
             // Создаем блок
-            uniform_block_data_info block(baseName);
+            uniform_block_data_info block(fullName);
             block.index = blockIdx;
             block.offset = isArrayBlock ? block_offset : 0;
 
