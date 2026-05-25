@@ -14,7 +14,7 @@ protected:
 
 public:
 	opengl_template_iterator() : Base(), program(-1) {}
-	opengl_template_iterator(const std::string& name, GLint program) : Base(name), program(program) {}
+	opengl_template_iterator(const std::string& name, GLint program = -1) : Base(name), program(program) {}
 
 	opengl_template_iterator(opengl_template_iterator&&) = default;
 	opengl_template_iterator& operator=(opengl_template_iterator&&) = default;
