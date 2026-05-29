@@ -6,6 +6,9 @@
 #include <iostream>
 #include <vector>
 
+template<typename T, typename OperArg>
+concept ConvertLike = std::is_convertible_v<T, OperArg>;
+
 template<typename Derived, typename ContainerType, typename OperArg, typename EntryType>
 class template_container_iterator {
 protected:
@@ -26,7 +29,8 @@ public:
 
     size_t size() const { return entries.size(); }
 
-    const EntryType& operator[](OperArg i) const {
+    template<ConvertLike<OperArg> T>
+    const EntryType& operator[](T i) const {
         if constexpr (std::is_integral_v<OperArg>) {
             if (i >= entries.size()) {
                 std::cerr << "Index out of range (size=" << entries.size() << ")" << std::endl;
@@ -38,7 +42,8 @@ public:
         }
     }
 
-    EntryType& operator[](OperArg i) {
+    template<ConvertLike<OperArg> T>
+    EntryType& operator[](T i) {
         if constexpr (std::is_integral_v<OperArg>) {
             if (i >= entries.size()) {
                 std::cerr << "Index out of range (size=" << entries.size() << ")" << std::endl;

@@ -9,6 +9,9 @@ template<typename EntryType>
 concept HasStringOperator = requires(EntryType & e) {
 	e[std::string{}];
 };
+// Концепт на проверку конвертации текущего типа в стринг
+template<typename T>
+concept StringLike = std::is_convertible_v<T, std::string>;
 
 template<typename Derived, typename EntryType>
 class opengl_template_iterator : public template_iterator<Derived, EntryType> {
@@ -18,12 +21,13 @@ protected:
 	using Base::entries;
 	GLint program;
 
-	auto& operator[](const std::string& fieldName)
-	{
-		return this->entries[0][fieldName];
+	template<StringLike T>
+	auto& operator[](T&& name) {
+		return this->entries[0][std::forward<T>(name)];
 	}
-	const auto& operator[](const std::string& fieldName) const {
-		return this->entries[0][fieldName];
+	template<StringLike T>
+	const auto& operator[](T&& name) const {
+		return this->entries[0][std::forward<T>(name)];
 	}
 
 	auto& operator[](size_t index) {
