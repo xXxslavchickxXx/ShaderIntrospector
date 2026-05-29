@@ -33,7 +33,9 @@ public:
             }
             return entries[i];
         }
-        return entries[i];
+        else {
+            return entries.at(i);
+        }
     }
 
     EntryType& operator[](OperArg i) {
@@ -43,7 +45,9 @@ public:
             }
             return entries[i];
         }
-        return entries[i];
+        else {
+            return entries[i];
+        }
     }
 
     auto begin() { return entries.begin(); }

@@ -14,7 +14,7 @@ struct uniform_block_field_info {
     GLint offset;
 
     uniform_block_field_info() = default;
-    uniform_block_field_info(const std::string& name) : name(name) {}
+    uniform_block_field_info(const std::string& name) : name(name), offset(-1), type(-1) {}
 
     friend std::ostream& operator<<(std::ostream& os, const uniform_block_field_info& h) {
         os << std::format("{} @ {}", h.name, h.offset);

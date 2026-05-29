@@ -14,6 +14,8 @@ namespace shader {
         friend class uniform_block_reflector;
 
     public:
+        using Base::operator[];
+
         GLint offset = 0;
 
         uniform_block_sequence_info() = default;
@@ -22,14 +24,6 @@ namespace shader {
         // Если не массив — приводим к handle
         operator uniform_block_data_info() const {
             return this->entries[0];
-        }
-
-        const uniform_block_data_info& operator[](size_t i) {
-            return this->entries[i];
-        }
-
-        const uniform_block_data_info& operator[](size_t i) const {
-            return this->entries.at(i);
         }
 
         void print(std::ostream& os, int indent = 0) const {

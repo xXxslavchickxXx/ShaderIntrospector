@@ -10,6 +10,8 @@ class uniform_block_view_info : public opengl_template_iterator<uniform_block_vi
     using Base = opengl_template_iterator<uniform_block_view_info, uniform_block_field_info>;
 
 public:
+    using Base::operator[];
+
     GLenum type = 0;
     GLint elementStride = 0;
 
@@ -18,17 +20,9 @@ public:
     uniform_block_view_info() = default;
     uniform_block_view_info(const std::string& name, GLint program) : Base(name, program) {}
 
-    // Если не массив — приводим к handle
+    // Если не массив — приводим к филду
     operator uniform_block_field_info() const {
         return this->entries[0];
-    }
-
-    uniform_block_field_info operator[](size_t i) {
-        return this->entries[i];
-    }
-
-    uniform_block_field_info operator[](size_t i) const {
-        return this->entries.at(i);
     }
 
     void print(std::ostream& os, int indent = 0) const {
