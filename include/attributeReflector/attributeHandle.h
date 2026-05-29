@@ -22,6 +22,7 @@ namespace shader {
 		using Base = opengl_template_iterator<attribute_iterator, attribute_handle>;
 
 	public:
+		using Base::operator[];
 		using Base::Base;
 	};
 }

@@ -18,10 +18,6 @@ protected:
 	using Base::entries;
 	GLint program;
 
-public:
-	opengl_template_iterator() : Base(), program(-1) {}
-	opengl_template_iterator(const std::string& name, GLint program = -1) : Base(name), program(program) {}
-
 	auto& operator[](const std::string& fieldName)
 	{
 		return this->entries[0][fieldName];
@@ -30,7 +26,6 @@ public:
 		return this->entries[0][fieldName];
 	}
 
-
 	auto& operator[](size_t index) {
 		return this->entries[index];
 	}
@@ -38,6 +33,10 @@ public:
 	const auto& operator[](size_t index) const {
 		return this->entries[index];
 	}
+
+public:
+	opengl_template_iterator() : Base(), program(-1) {}
+	opengl_template_iterator(const std::string& name, GLint program = -1) : Base(name), program(program) {}
 
 	opengl_template_iterator(opengl_template_iterator&&) = default;
 	opengl_template_iterator& operator=(opengl_template_iterator&&) = default;
