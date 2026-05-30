@@ -31,10 +31,16 @@ protected:
 	}
 
 	auto& operator[](size_t index) {
+		if (index >= entries.size()) {
+			throw std::out_of_range("OTI out_of_range: size_t");
+		}
 		return this->entries[index];
 	}
 
 	const auto& operator[](size_t index) const {
+		if (index >= entries.size()) {
+			throw std::out_of_range("OTI out_of_range: size_t");
+		}
 		return this->entries[index];
 	}
 
